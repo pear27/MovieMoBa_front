@@ -69,11 +69,19 @@
 npm install
 ```
 
+* Expo 로그인:
+Expo 모바일 어플리케이션에서 생성한 계정으로 로그인합니다.
+
+```
+expo login
+```
+
+
 * 프로젝트 실행:
 
 ```
 npx expo start
 ```
 
-* 실제 기기에서는 Expo Go 앱 설치 후 QR 코드 스캔
+* 실제 기기에서 Expo Go 실행 후 QR 코드 스캔 혹은 현재 실행 중인 프로젝트 열기
 
