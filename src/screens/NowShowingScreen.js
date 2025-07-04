@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { TMDB_API_KEY } from "@env";
+import { useNavigation } from "@react-navigation/native";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
@@ -8,6 +16,8 @@ const API_KEY = TMDB_API_KEY;
 const NowShowingScreen = () => {
   const [nowPlaying, setNowPlaying] = useState([]);
   const [jsonnowPlaying, setjsonNowPlaying] = useState(false);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -30,10 +40,14 @@ const NowShowingScreen = () => {
       <View style={styles.container}>
         {jsonnowPlaying &&
           nowPlaying.map((movie) => (
-            <View key={movie.id} style={styles.showingMovie}>
+            <TouchableOpacity
+              key={movie.id}
+              style={styles.showingMovie}
+              onPress={() => navigation.navigate("Detail", { id: movie.id })}
+            >
               <Image
                 source={{
-                  uri: `https://image.tmdb.org/t/p/w92${movie.poster_path}`,
+                  uri: `https://image.tmdb.org/t/p/w185${movie.poster_path}`,
                 }}
                 style={styles.poster}
               />
@@ -44,7 +58,7 @@ const NowShowingScreen = () => {
                   {`★ ${movie.vote_average.toFixed(1)} (${movie.vote_count}명)`}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
       </View>
     </ScrollView>
@@ -69,7 +83,7 @@ const styles = StyleSheet.create({
   },
   poster: {
     height: "100%",
-    aspectRatio: 2 / 3, // TMDb 포스터 일반 비율 (약 0.666)
+    aspectRatio: 2 / 3, // TMDb 포스터 일반 비율
     resizeMode: "cover",
     marginRight: 10,
     borderRadius: 4,
