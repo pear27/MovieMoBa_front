@@ -1,15 +1,15 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const PosterScreen = () => {
+const AIScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Movie Posters</Text>
+      <Text>Movie Top 3</Text>
     </View>
   );
 };
 
-export default PosterScreen;
+export default AIScreen;
 
 const styles = StyleSheet.create({
   container: {
