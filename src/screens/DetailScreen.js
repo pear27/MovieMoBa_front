@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ToastAndroid,
 } from "react-native";
 import { TMDB_API_KEY } from "@env";
 
@@ -139,8 +140,14 @@ const DetailScreen = ({ route }) => {
 
   // post review
   const handleReviewSubmit = () => {
+    /** 사용자가 내용을 입력하지 않은 경우 */
+    if (review.trim() === "") {
+      ToastAndroid.show("내용을 입력해주세요.", ToastAndroid.SHORT);
+      return;
+    }
     /** 리뷰 백엔드에 보내는 코드 */
     console.log(`star:${starRating}, review:${review}, movieID:${id}`);
+    ToastAndroid.show("리뷰가 등록되었습니다.", ToastAndroid.SHORT);
     setReview("");
     setStarRating(0);
     fetchReviewList();
