@@ -20,7 +20,7 @@ const NowShowingScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchNowShowingMovies = async () => {
       try {
         // Now Playing Movie List
         const nowPlayingResponse = await fetch(
@@ -32,7 +32,7 @@ const NowShowingScreen = () => {
         console.error("Error fetching movies:", error);
       }
     };
-    fetchMovies();
+    fetchNowShowingMovies();
   }, []);
 
   return (
