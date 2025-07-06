@@ -15,7 +15,6 @@ const API_KEY = TMDB_API_KEY;
 
 const NowShowingScreen = () => {
   const [nowPlaying, setNowPlaying] = useState([]);
-  const [jsonnowPlaying, setjsonNowPlaying] = useState(false);
 
   const navigation = useNavigation();
 
@@ -27,7 +26,6 @@ const NowShowingScreen = () => {
           `${baseURL}movie/now_playing?api_key=${API_KEY}&language=ko-KR&page=1&region=KR&page=1`
         );
         setNowPlaying((await nowPlayingResponse.json()).results);
-        setjsonNowPlaying(true);
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
@@ -38,7 +36,7 @@ const NowShowingScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {jsonnowPlaying &&
+        {nowPlaying.length !== 0 &&
           nowPlaying.map((movie) => (
             <TouchableOpacity
               key={movie.id}
