@@ -8,20 +8,48 @@ import {
   ScrollView,
   ToastAndroid,
 } from "react-native";
+import { TUNNEL_BACKEND_URL } from "@env";
+
+const BACKEND_URL = "https://icy-things-cross.loca.lt";
 
 const AIScreen = () => {
   const [userPrompt, setUserPrompt] = useState("");
+  const [AIanswer, setAIanswer] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   // post user prompt
-  const handleUserPromptSubmit = () => {
+  const handleUserPromptSubmit = async () => {
+    setLoading(true);
     if (userPrompt.trim() === "") {
       ToastAndroid.show("내용을 입력해주세요.", ToastAndroid.SHORT);
       return;
     }
     /** 프롬프트 백엔드에 보내는 코드 */
-    console.log(`prompt: ${userPrompt}`);
-    setUserPrompt("");
-    /** 여기서 바로 추천작 id를 받아올 수 있으면 해당 id로 TMDB에서 포스터, 제목, 연도 등 정보 fetch */
+    try {
+      const response = await fetch(`${BACKEND_URL}/ask`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: userPrompt }),
+      });
+      if (!response.ok) {
+        throw new Error(`서버 응답 오류: ${response.status}`);
+      }
+      console.log(`prompt: ${userPrompt}`);
+      setUserPrompt("");
+
+      /** 추천작은 텍스트로 나옴 */
+      const data = await response.json();
+      setAIanswer(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("질문 보내기를 실패하였습니다.", error.message);
+      ToastAndroid.show("질문 보내기를 실패하였습니다.", ToastAndroid.SHORT);
+      setLoading(false);
+      return null;
+    }
   };
 
   return (
@@ -46,6 +74,11 @@ const AIScreen = () => {
             onPress={handleUserPromptSubmit}
           />
         </View>
+        {loading ? (
+          <Text>LOADING</Text>
+        ) : (
+          AIanswer !== "" && <Text>{AIanswer.answer}</Text>
+        )}
       </View>
     </ScrollView>
   );
