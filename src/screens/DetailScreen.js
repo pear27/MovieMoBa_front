@@ -12,11 +12,11 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import { TMDB_API_KEY } from "@env";
+import { TMDB_API_KEY, TUNNEL_BACKEND_URL } from "@env";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
-const BACKEND_URL = "realBACKENDurl"; // backend url 입력하기
+const BACKEND_URL = TUNNEL_BACKEND_URL;
 
 const DetailScreen = ({ route }) => {
   const { id } = route.params;
@@ -35,57 +35,18 @@ const DetailScreen = ({ route }) => {
   // fetch review list
   const fetchReviewList = async () => {
     try {
-      /*
-      const response = await axios.get(`${BACKEND_URL}/posts/list`, {
-        params: { type: sortOption },
-      });*/
+      const response = await fetch(`${BACKEND_URL}reviews/${movieDetail.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      // setPosts(response.data); // 성공적으로 데이터를 받으면 반환
-      setReviewList([
-        // 예시 자료
-        {
-          content: "스토리가 탄탄해서 몰입감 최고!",
-          rating: 9,
-          time: 1720080000,
-        },
-        {
-          content: "배우들의 연기가 인상적이었어요.",
-          rating: 8,
-          time: 1720076400,
-        },
-        {
-          content: "생각보다 별로였음.. 기대 이하",
-          rating: 5,
-          time: 1720072800,
-        },
-        {
-          content: "마지막 반전이 정말 소름 돋았어요",
-          rating: 10,
-          time: 1720069200,
-        },
-        {
-          content: "잔잔하지만 여운이 남는 영화였어요.",
-          rating: 8,
-          time: 1720065600,
-        },
-        {
-          content: "전개가 너무 느려서 좀 지루했어요",
-          rating: 6,
-          time: 1720062000,
-        },
-        { content: "CG랑 음악이 환상적이에요!", rating: 9, time: 1720058400 },
-        {
-          content: "아이들과 함께 보기 좋은 영화",
-          rating: 7,
-          time: 1720054800,
-        },
-        {
-          content: "너무 감동적이어서 눈물 났어요ㅠ",
-          rating: 10,
-          time: 1720051200,
-        },
-        { content: "평범한 스토리, 무난한 연출", rating: 6, time: 1720047600 },
-      ]);
+      if (!response.ok) {
+        throw new Error(`리뷰 불러오기 실패: ${response.status}`);
+      }
+
+      setReviewList(await response.json());
     } catch (error) {
       console.error("Error fetching review list:", error);
       setReviewList([]);
@@ -139,18 +100,42 @@ const DetailScreen = ({ route }) => {
   };
 
   // post review
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = async () => {
     /** 사용자가 내용을 입력하지 않은 경우 */
     if (review.trim() === "") {
       ToastAndroid.show("내용을 입력해주세요.", ToastAndroid.SHORT);
       return;
     }
+
+    const reviewData = {
+      movieID: id,
+      comment: review,
+      rating: starRating,
+    };
+
     /** 리뷰 백엔드에 보내는 코드 */
-    console.log(`star:${starRating}, review:${review}, movieID:${id}`);
-    ToastAndroid.show("리뷰가 등록되었습니다.", ToastAndroid.SHORT);
-    setReview("");
-    setStarRating(0);
-    fetchReviewList();
+    try {
+      const response = await fetch(`${BACKEND_URL}reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reviewData),
+      });
+      if (!response.ok) {
+        throw new Error(`리뷰 등록 실패: ${response.status}`);
+      }
+
+      console.log(`star:${starRating}, review:${review}, movieID:${id}`);
+      ToastAndroid.show("리뷰가 등록되었습니다.", ToastAndroid.SHORT);
+      setReview("");
+      setStarRating(0);
+      fetchReviewList();
+    } catch (error) {
+      console.error("리뷰 등록에 실패하였습니다.", error.message);
+      ToastAndroid.show("리뷰 등록에 실패하였습니다.", ToastAndroid.SHORT);
+      return null;
+    }
   };
 
   // fetch movie detail
@@ -227,11 +212,11 @@ const DetailScreen = ({ route }) => {
         {reviewList.length !== 0 && (
           <View style={styles.reviewList}>
             {reviewList.map((review) => (
-              <View key={review.time} style={styles.review}>
+              <View key={review.createdAt} style={styles.review}>
                 <View style={{ flexDirection: "row" }}>
                   {reviewStar(review.rating)}
                 </View>
-                <Text>{review.content}</Text>
+                <Text>{review.comment}</Text>
               </View>
             ))}
           </View>
