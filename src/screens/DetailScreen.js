@@ -16,7 +16,7 @@ import { TMDB_API_KEY, TUNNEL_BACKEND_URL } from "@env";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
-const BACKEND_URL = TUNNEL_BACKEND_URL;
+const BACKEND_URL = "https://icy-things-cross.loca.lt";
 
 const DetailScreen = ({ route }) => {
   const { id } = route.params;
@@ -35,7 +35,7 @@ const DetailScreen = ({ route }) => {
   // fetch review list
   const fetchReviewList = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}reviews/${movieDetail.id}`, {
+      const response = await fetch(`${BACKEND_URL}/reviews/${movieDetail.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ const DetailScreen = ({ route }) => {
 
     /** 리뷰 백엔드에 보내는 코드 */
     try {
-      const response = await fetch(`${BACKEND_URL}reviews`, {
+      const response = await fetch(`${BACKEND_URL}/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
