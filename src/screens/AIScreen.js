@@ -9,6 +9,8 @@ import {
   ScrollView,
   ToastAndroid,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 import { TMDB_API_KEY, BACKEND_URL } from "@env";
@@ -132,40 +134,45 @@ const AIScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.h1}>모바야, 나 오늘 무비 모바??</Text>
-        <Text style={styles.h6}>
-          모바에게 어떤 영화를 보고 싶은지 알려주세요!
-        </Text>
-        <View style={styles.userPromptForm}>
-          <TextInput
-            style={styles.userPromptInput}
-            placeholder="(예) 몰입캠프에서 팀메이트 몰래 볼 영화를 추천해줘"
-            placeholderTextColor="#b3b3b3"
-            multiline
-            value={userPrompt}
-            onChangeText={setUserPrompt}
-          />
-          <Button
-            title="모바한테 물어바"
-            color="#e50914"
-            style={styles.userPromptButton}
-            onPress={handleUserPromptSubmit}
-          />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.h1}>모바야, 나 오늘 무비 모바??</Text>
+          <Text style={styles.h6}>
+            모바에게 어떤 영화를 보고 싶은지 알려주세요!
+          </Text>
+          <View style={styles.userPromptForm}>
+            <TextInput
+              style={styles.userPromptInput}
+              placeholder="(예) 몰입캠프에서 팀메이트 몰래 볼 영화를 추천해줘"
+              placeholderTextColor="#b3b3b3"
+              multiline
+              value={userPrompt}
+              onChangeText={setUserPrompt}
+            />
+            <Button
+              title="모바한테 물어바"
+              color="#e50914"
+              style={styles.userPromptButton}
+              onPress={handleUserPromptSubmit}
+            />
+          </View>
+          {loading ? (
+            <Text style={styles.h1}>LOADING....</Text>
+          ) : (
+            AIanswer !== "" && (
+              <View style={styles.container}>
+                <Text style={styles.h3}>모바픽 영화를 감상해보세요!</Text>
+                {movieComponents}
+              </View>
+            )
+          )}
         </View>
-        {loading ? (
-          <Text style={styles.h1}>LOADING....</Text>
-        ) : (
-          AIanswer !== "" && (
-            <View style={styles.container}>
-              <Text style={styles.h3}>모바픽 영화를 감상해보세요!</Text>
-              {movieComponents}
-            </View>
-          )
-        )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
