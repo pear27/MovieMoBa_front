@@ -277,7 +277,7 @@ const PosterScreen = () => {
       ) : surveyCompleted ? (
         <View style={styles.container}>
           <View>
-            <Text>좋아하실 만한 영화</Text>
+            <Text style={styles.recTitle}>좋아하실 만한 영화</Text>
             <View style={styles.posterContainer}>
               {recommendedMovies.length !== 0 &&
                 recommendedMovies.map((movie) => (
@@ -288,13 +288,13 @@ const PosterScreen = () => {
                       }}
                       style={styles.poster}
                     />
-                    <Text>{movie.title}</Text>
+                    <Text style={styles.movieTitle}>{movie.title}</Text>
                   </View>
                 ))}
             </View>
           </View>
           <View>
-            <Text>도전해 볼 만한 영화</Text>
+            <Text style={styles.recTitle}>도전해 볼 만한 영화</Text>
             <View style={styles.posterContainer}>
               {howAboutMovies.length !== 0 &&
                 howAboutMovies.slice(0, 6).map((movie) => (
@@ -305,13 +305,13 @@ const PosterScreen = () => {
                       }}
                       style={styles.poster}
                     />
-                    <Text>{movie.title}</Text>
+                    <Text style={styles.movieTitle}>{movie.title}</Text>
                   </View>
                 ))}
             </View>
           </View>
           <View>
-            <Text>평점 높은 영화</Text>
+            <Text style={styles.recTitle}>평점 높은 영화</Text>
             <View style={styles.posterContainer}>
               {topRatedMovies.length !== 0 &&
                 topRatedMovies.slice(0, 6).map((movie) => (
@@ -328,13 +328,13 @@ const PosterScreen = () => {
                       }}
                       style={styles.poster}
                     />
-                    <Text>{movie.title}</Text>
+                    <Text style={styles.movieTitle}>{movie.title}</Text>
                   </TouchableOpacity>
                 ))}
             </View>
           </View>
           <View>
-            <Text>리뷰 많은 영화</Text>
+            <Text style={styles.recTitle}>리뷰 많은 영화</Text>
             <View style={styles.posterContainer}>
               {topReviewedMovies.length !== 0 &&
                 topReviewedMovies.slice(0, 6).map((movie) => (
@@ -351,22 +351,30 @@ const PosterScreen = () => {
                       }}
                       style={styles.poster}
                     />
-                    <Text>{movie.title}</Text>
+                    <Text style={styles.movieTitle}>{movie.title}</Text>
                   </TouchableOpacity>
                 ))}
             </View>
           </View>
+          <Button
+            title="영화 취향 찾기"
+            color="#e50914"
+            style={styles.surveyButton}
+            onPress={navigateToSurvey}
+          />
         </View>
       ) : (
-        <View>
-          <Text>좋아하실 만한 영화를 추천해 드릴게요!</Text>
+        <View style={styles.container}>
+          <Text style={styles.h1}>내 영화 취향은 어떨까??</Text>
+          <Text style={styles.h6}>자신의 영화 MBTI를 분석해보세요!{'\n'}</Text>
+          <Button
+            title="영화 취향 찾기"
+            color="#e50914"
+            style={styles.surveyButton}
+            onPress={navigateToSurvey}
+          />
         </View>
       )}
-      <Button
-        title="영화 취향 찾기"
-        style={styles.surveyButton}
-        onPress={navigateToSurvey}
-      />
     </ScrollView>
   );
 };
@@ -374,21 +382,98 @@ const PosterScreen = () => {
 export default PosterScreen;
 
 const styles = StyleSheet.create({
-  container: {},
+  scrollContainer: {
+    paddingVertical: 24,
+    backgroundColor: "#141414", // 넷플릭스 다크 배경
+    minHeight: "100%",
+  },
+  container: {
+    flex:1,
+    backgroundColor: "#141414",
+    paddingHorizontal: 4,
+    paddingBottom: 32,
+    borderRadius: 12,
+    justifyContent: "center",
+  },
   posterContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    padding: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 2,
   },
   movie: {
-    width: "32%",
-    paddingVertical: 5,
+    width: "31%",
+    marginBottom: 18,
+    borderRadius: 10,
+    overflow: "hidden",
+    backgroundColor: "#232323", // 카드 느낌의 다크 그레이
+    // 그림자 효과 (iOS/Android)
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 7,
+    elevation: 5,
+    alignItems: "center",
   },
   poster: {
     width: "100%",
     aspectRatio: 2 / 3,
     resizeMode: "cover",
-    borderRadius: 8,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    borderColor: "#444",
+  },
+  movieTitle: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "700",
+    marginTop: 6,
+    marginBottom: 2,
+    textAlign: "center",
+    textShadowColor: "#000",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  recTitle: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "700",
+    marginTop: 6,
+    marginBottom: 2,
+    textShadowColor: "#000",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  surveyButton: {
+    backgroundColor: "#e50914", // 넷플릭스 레드
+    borderRadius: 6,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    alignSelf: "center",
+    marginVertical: 18,
+  },
+  surveyButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+  h1: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 12,
+    textShadowColor: "#000",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    letterSpacing: 1,
+  },
+  h6: {
+    fontSize: 20,
+    color: "#b3b3b3",
+    marginVertical: 5,
+    fontWeight: "500",
   },
 });
+

@@ -41,7 +41,17 @@ export default function App() {
           <Stack.Screen
             name="Survey"
             component={SurveyScreen}
-            options={{ title: "영화 취향 분석" }}
+            options={{
+              headerStyle: {
+                backgroundColor: "#141414",
+              },
+              headerTitleStyle: {
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: 23,
+              },
+              headerTintColor: "#fff",
+              title: "영화 취향 분석" }}
           />
         </Stack.Navigator>
       </NavigationContainer>

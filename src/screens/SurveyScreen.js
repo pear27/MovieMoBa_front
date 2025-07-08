@@ -93,7 +93,7 @@ const SurveyScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <Text>
+        <Text style={styles.h6}>
           최근 10년간의 인기 영화 중 마음에 들었던 작품을 3~4편 선택해주세요.
         </Text>
         <View style={styles.posterContainer}>
@@ -135,7 +135,7 @@ const SurveyScreen = () => {
                       opacity: isLiked ? 0.3 : 1,
                     }}
                   />
-                  <Text>{movie.title}</Text>
+                  <Text style={styles.movieTitle}>{movie.title}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -146,6 +146,7 @@ const SurveyScreen = () => {
             step < movieGroups.length - 1 && (
               <Button
                 title="다음"
+                color="#e50914"
                 onPress={() => setStep((prev) => prev + 1)}
               />
             )}
@@ -155,7 +156,7 @@ const SurveyScreen = () => {
               movieGroups[step].some((groupMovie) => groupMovie.id === m.id)
             ).length >= 3 &&
             step === movieGroups.length - 1 && (
-              <Button title="완료" onPress={handleLikeMoviesSave} />
+              <Button title="완료" color="#e50914" onPress={handleLikeMoviesSave} />
             )}
         </View>
       </View>
@@ -167,23 +168,64 @@ export default SurveyScreen;
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    padding: 20,
-    paddingBottom: 90,
+    paddingVertical: 24,
+    paddingHorizontal: 8,
+    backgroundColor: "#141414", // 넷플릭스 다크 배경
+    minHeight: "100%",
   },
-  container: {},
+  container: {
+    backgroundColor: "#141414",
+    borderRadius: 12,
+    paddingBottom: 32,
+    paddingHorizontal: 4,
+  },
   posterContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    paddingVertical: 8,
+    paddingHorizontal: 2,
   },
   movie: {
-    width: "45%",
-    paddingVertical: 5,
+    width: "47%",
+    marginBottom: 18,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#232323", // 카드 느낌의 다크 그레이
+    // 그림자 효과 (iOS/Android)
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 7,
+    elevation: 5,
+    alignItems: "center",
   },
   poster: {
     width: "100%",
     aspectRatio: 2 / 3,
     resizeMode: "cover",
-    borderRadius: 8,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: "#444",
+  },
+  movieTitle: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "700",
+    marginTop: 6,
+    marginBottom: 2,
+    textAlign: "center",
+    textShadowColor: "#000",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  selectedPoster: {
+    opacity: 0.3,
+  },
+  h6: {
+    fontSize: 20,
+    color: "#fff", // 연한 회색
+    marginVertical: 5,
+    fontWeight: "500",
   },
 });
