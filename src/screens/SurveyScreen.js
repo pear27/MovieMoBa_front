@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -20,6 +20,7 @@ const SurveyScreen = () => {
   const [movieGroups, setMovieGroups] = useState([]);
 
   const [step, setStep] = useState(0); // 0: movies1, 1: movies2, 2: movies3
+  const scrollRef = useRef(null);
 
   const [likeMovies, setLikeMovies] = useState([]);
 
@@ -91,7 +92,7 @@ const SurveyScreen = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView contentContainerStyle={styles.scrollContainer} ref={scrollRef}>
       <View style={styles.container}>
         <Text style={styles.h6}>
           최근 10년간의 인기 영화 중 마음에 들었던 작품을 3~4편 선택해주세요.
@@ -147,7 +148,10 @@ const SurveyScreen = () => {
               <Button
                 title="다음"
                 color="#e50914"
-                onPress={() => setStep((prev) => prev + 1)}
+                onPress={() => {
+                  setStep((prev) => prev + 1);
+                  scrollRef.current?.scrollTo({ y: 0, animated: true });
+                }}
               />
             )}
 
@@ -156,7 +160,11 @@ const SurveyScreen = () => {
               movieGroups[step].some((groupMovie) => groupMovie.id === m.id)
             ).length >= 3 &&
             step === movieGroups.length - 1 && (
-              <Button title="완료" color="#e50914" onPress={handleLikeMoviesSave} />
+              <Button
+                title="완료"
+                color="#e50914"
+                onPress={handleLikeMoviesSave}
+              />
             )}
         </View>
       </View>
