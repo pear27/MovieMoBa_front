@@ -229,7 +229,7 @@ const DetailScreen = ({ route }) => {
                 <View style={{ flexDirection: "row" }}>
                   {reviewStar(review.rating)}
                 </View>
-                <Text style={styles.overview}>{review.content}</Text>
+                <Text style={styles.overview}>{review.comment}</Text>
               </View>
             ))
           ) : (
@@ -359,7 +359,6 @@ const styles = StyleSheet.create({
     height: 20,
     resizeMode: "contain",
     margin: 0,
-    tintColor: "#FFD700",
   },
   review: {
     paddingVertical: 15,
