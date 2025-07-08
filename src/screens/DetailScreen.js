@@ -27,6 +27,7 @@ const DetailScreen = ({ route }) => {
   const stars = [];
 
   const [review, setReview] = useState("");
+  const [reviewUploading, setReviewUploading] = useState(false);
 
   const [reviewList, setReviewList] = useState([]);
   const [jsonReviewList, setjsonReviewList] = useState(false);
@@ -102,9 +103,12 @@ const DetailScreen = ({ route }) => {
 
   // post review
   const handleReviewSubmit = async () => {
+    setReviewUploading(true);
+
     /** 사용자가 내용을 입력하지 않은 경우 */
     if (review.trim() === "") {
       ToastAndroid.show("내용을 입력해주세요.", ToastAndroid.SHORT);
+      setReviewUploading(false);
       return;
     }
 
@@ -114,7 +118,6 @@ const DetailScreen = ({ route }) => {
       rating: starRating,
     };
 
-    /** 리뷰 백엔드에 보내는 코드 */
     try {
       const response = await fetch(`${BACKEND_URL}/reviews`, {
         method: "POST",
@@ -131,10 +134,12 @@ const DetailScreen = ({ route }) => {
       ToastAndroid.show("리뷰가 등록되었습니다.", ToastAndroid.SHORT);
       setReview("");
       setStarRating(0);
+      setReviewUploading(false);
       fetchReviewList();
     } catch (error) {
       console.error("리뷰 등록에 실패하였습니다.", error.message);
       ToastAndroid.show("리뷰 등록에 실패하였습니다.", ToastAndroid.SHORT);
+      setReviewUploading(false);
       return null;
     }
   };
@@ -207,9 +212,10 @@ const DetailScreen = ({ route }) => {
             onChangeText={setReview}
           />
           <Button
-            title="등록"
+            title={reviewUploading ? "LOADING" : "등록"}
             style={styles.reviewButton}
             onPress={handleReviewSubmit}
+            disabled={reviewUploading}
           />
         </View>
         <View style={styles.reviewList}>
