@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import BottomTabNavigator from "./src/navigation/BottomTabNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import DetailScreen from "./src/screens/DetailScreen";
+import SurveyScreen from "./src/screens/SurveyScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,9 +26,13 @@ export default function App() {
             component={DetailScreen}
             options={{ title: "영화 상세 정보" }}
           />
+          {/* 영화 취향 설문 화면 */}
+          <Stack.Screen
+            name="Survey"
+            component={SurveyScreen}
+            options={{ title: "영화 취향 분석" }}
+          />
         </Stack.Navigator>
-
-        {/*<BottomTabNavigator />*/}
       </NavigationContainer>
     </>
   );
