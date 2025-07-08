@@ -12,11 +12,10 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import { TMDB_API_KEY, TUNNEL_BACKEND_URL } from "@env";
+import { TMDB_API_KEY, BACKEND_URL } from "@env";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
-const BACKEND_URL = "https://icy-things-cross.loca.lt";
 
 const DetailScreen = ({ route }) => {
   const { id } = route.params;
@@ -30,6 +29,7 @@ const DetailScreen = ({ route }) => {
   const [review, setReview] = useState("");
 
   const [reviewList, setReviewList] = useState([]);
+  const [jsonReviewList, setjsonReviewList] = useState(false);
   // backend server에서 불러온 reviews
 
   // fetch review list
@@ -47,6 +47,7 @@ const DetailScreen = ({ route }) => {
       }
 
       setReviewList(await response.json());
+      setjsonReviewList(true);
     } catch (error) {
       console.error("Error fetching review list:", error);
       setReviewList([]);
@@ -153,9 +154,11 @@ const DetailScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    fetchReviewList();
     fetchMovie();
-  }, []);
+    if (movieDetail.id) {
+      fetchReviewList();
+    }
+  }, [movieDetail]);
 
   return (
     <KeyboardAvoidingView
@@ -209,18 +212,20 @@ const DetailScreen = ({ route }) => {
             onPress={handleReviewSubmit}
           />
         </View>
-        {reviewList.length !== 0 && (
-          <View style={styles.reviewList}>
-            {reviewList.map((review) => (
+        <View style={styles.reviewList}>
+          {jsonReviewList ? (
+            reviewList.map((review) => (
               <View key={review.createdAt} style={styles.review}>
                 <View style={{ flexDirection: "row" }}>
                   {reviewStar(review.rating)}
                 </View>
                 <Text>{review.comment}</Text>
               </View>
-            ))}
-          </View>
-        )}
+            ))
+          ) : (
+            <Text>LOADING</Text>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
