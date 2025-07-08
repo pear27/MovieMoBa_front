@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style="light-content" />
       <NavigationContainer>
         <Stack.Navigator>
           {/* 탭 네비게이터 */}
@@ -24,7 +24,24 @@ export default function App() {
           <Stack.Screen
             name="Detail"
             component={DetailScreen}
-            options={{ title: "영화 상세 정보" }}
+            options={{ 
+              headerStyle: {
+                backgroundColor: "#141414",
+              },
+              headerTitleStyle: {
+                color: "#fff",        
+                fontWeight: "bold",
+                fontSize: 23,
+              },
+              headerTintColor: "#fff",
+              title:"영화 상세 정보"
+            }}
+          />
+          {/* 영화 취향 설문 화면 */}
+          <Stack.Screen
+            name="Survey"
+            component={SurveyScreen}
+            options={{ title: "영화 취향 분석" }}
           />
           {/* 영화 취향 설문 화면 */}
           <Stack.Screen
