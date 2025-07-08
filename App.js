@@ -24,24 +24,18 @@ export default function App() {
           <Stack.Screen
             name="Detail"
             component={DetailScreen}
-            options={{ 
+            options={{
               headerStyle: {
                 backgroundColor: "#141414",
               },
               headerTitleStyle: {
-                color: "#fff",        
+                color: "#fff",
                 fontWeight: "bold",
                 fontSize: 23,
               },
               headerTintColor: "#fff",
-              title:"영화 상세 정보"
+              title: "영화 상세 정보",
             }}
-          />
-          {/* 영화 취향 설문 화면 */}
-          <Stack.Screen
-            name="Survey"
-            component={SurveyScreen}
-            options={{ title: "영화 취향 분석" }}
           />
           {/* 영화 취향 설문 화면 */}
           <Stack.Screen

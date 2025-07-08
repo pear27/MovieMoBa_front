@@ -15,7 +15,6 @@ import { TMDB_API_KEY, BACKEND_URL } from "@env";
 import { useNavigation } from "@react-navigation/native";
 
 const axios = require("axios");
-const BACKEND_URL = "https://moviemoba-back.onrender.com";
 
 var usedMovies = [];
 var AI_recommend = [];
