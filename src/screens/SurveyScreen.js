@@ -9,7 +9,7 @@ import {
   Button,
   ToastAndroid,
 } from "react-native";
-import { TMDB_API_KEY, TUNNEL_BACKEND_URL } from "@env";
+import { TMDB_API_KEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -39,7 +39,7 @@ const SurveyScreen = () => {
     while (moviesForSurvey.length < 30) {
       // discover API 호출: 최근 10년간 인기 영화 (sort_by=popularity)
       const discoverResponse = await fetch(
-        `${baseURL}discover/movie?api_key=${API_KEY}&language=ko&sort_by=popularity.desc&vote_count.gte=100&primary_release_date.gte=${formattedDate}&page=${page}`
+        `${baseURL}discover/movie?api_key=${API_KEY}&language=en&sort_by=popularity.desc&vote_count.gte=100&primary_release_date.gte=${formattedDate}&page=${page}`
       );
 
       // 영화 리스트 추출
@@ -76,7 +76,7 @@ const SurveyScreen = () => {
   // post "like movies"
   const handleLikeMoviesSave = async () => {
     try {
-      await AsyncStorage.setItem("surveyCompleted", JSON.stringify(true));
+      await AsyncStorage.setItem("likeMovies", JSON.stringify(likeMovies));
       ToastAndroid.show("영화 목록이 등록되었습니다.", ToastAndroid.SHORT);
       console.log("설문 완료 상태 저장됨");
       navigation.navigate("Tabs", { screen: "추천작" });
