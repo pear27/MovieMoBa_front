@@ -12,11 +12,10 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import { TMDB_API_KEY } from "@env";
+import { TMDB_API_KEY, BACKEND_URL } from "@env";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
-const BACKEND_URL = "realBACKENDurl"; // backend url 입력하기
 
 const DetailScreen = ({ route }) => {
   const { id } = route.params;
@@ -188,7 +187,7 @@ const DetailScreen = ({ route }) => {
             />
             <View style={styles.movieInfo}>
               <Text style={styles.title}>{movieDetail.title}</Text>
-              <Text>{movieDetail.original_title}</Text>
+              <Text style={styles.originalTitle}>{movieDetail.original_title}</Text>
               <Text
                 style={styles.voteAverage}
               >{`★ ${movieDetail.vote_average.toFixed(1)} (${
@@ -208,18 +207,20 @@ const DetailScreen = ({ route }) => {
         <View style={styles.reviewForm}>
           <View style={styles.starRating}>
             <View style={styles.starContainer}>{StarRating()}</View>
-            <Text>{`별점: ${starRating}점`}</Text>
+            <Text style={styles.overview}>{`별점: ${starRating}점`}</Text>
           </View>
           <TextInput
             className="review-input"
             style={styles.reviewInput}
             placeholder="리뷰를 작성해주세요"
+            placeholderTextColor="#fff"
             multiline
             value={review}
             onChangeText={setReview}
           />
           <Button
             title="등록"
+            color="#e50914"
             style={styles.reviewButton}
             onPress={handleReviewSubmit}
           />
@@ -231,7 +232,7 @@ const DetailScreen = ({ route }) => {
                 <View style={{ flexDirection: "row" }}>
                   {reviewStar(review.rating)}
                 </View>
-                <Text>{review.content}</Text>
+                <Text style={styles.overview}>{review.content}</Text>
               </View>
             ))}
           </View>
@@ -244,26 +245,60 @@ const DetailScreen = ({ route }) => {
 export default DetailScreen;
 
 const styles = StyleSheet.create({
-  scrollContainer: { paddingBottom: 90 },
+  scrollContainer: {
+    paddingBottom: 90,
+    backgroundColor: "#141414",
+  },
   container: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: "#141414",
   },
   backdrop: {
     width: "100%",
     aspectRatio: 16 / 9,
     resizeMode: "cover",
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    borderWidth: 0,
   },
   movieInfo: {
-    padding: 12,
+    padding: 20,
+    backgroundColor: "#222", // 카드 느낌의 다크 그레이
+    borderRadius: 12,
+    marginHorizontal: 12,
+    marginTop: -32, // 백드롭과 자연스럽게 겹치게
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
+    color: "#fff",
     marginTop: 10,
+    marginBottom: 4,
+    textShadowColor: "#000",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  originalTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+    marginTop: 10,
+    marginBottom: 4,
+    textShadowColor: "#000",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   voteAverage: {
     fontSize: 16,
+    color: "#FFD700",
+    fontWeight: "bold",
+    marginBottom: 6,
   },
   description: {
     paddingTop: 12,
@@ -271,10 +306,14 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#fff",
     paddingBottom: 5,
   },
   overview: {
+    color: "#e5e5e5",
     textAlign: "justify",
+    fontSize: 16,
+    lineHeight: 24,
   },
   starRating: {
     justifyContent: "center",
@@ -294,10 +333,25 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   reviewForm: {
-    padding: 12,
+    padding: 16,
+    backgroundColor: "#222",
+    borderRadius: 10,
+    margin: 12,
   },
-  reviewInput: {},
-  reviewButton: {},
+  reviewInput: {
+    backgroundColor: "#181818",
+    color: "#fff",
+    borderRadius: 6,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  reviewButton: {
+    backgroundColor: "#e50914",
+    borderRadius: 6,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
   reviewList: {
     padding: 12,
   },
@@ -306,10 +360,11 @@ const styles = StyleSheet.create({
     height: 20,
     resizeMode: "contain",
     margin: 0,
+    tintColor: "#FFD700",
   },
   review: {
     paddingVertical: 15,
     borderBottomWidth: 0.5,
-    borderBottomColor: "gray",
+    borderBottomColor: "#333",
   },
 });
