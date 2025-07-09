@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,68 +15,9 @@ import {
 
 import { TMDB_API_KEY, BACKEND_URL } from "@env";
 import { useNavigation } from "@react-navigation/native";
+import LoadingAnimation from "../components/LoadingAnimation";
 
 const axios = require("axios");
-
-var usedMovies = [];
-var AI_recommend = [];
-var movieComponents = [];
-
-async function fetchMovieJsonList(titles) {
-  const results = [];
-  for (const movie of titles) {
-    const title = movie.title;
-    const year = movie.release_date;
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${title}&language=ko-KR&year=${year}`;
-    try {
-      const resp = await axios.get(url);
-      if (resp.data.results && resp.data.results.length > 0) {
-        if (resp.data.results[0].title === title) {
-          results.push(resp.data.results[0]);
-          usedMovies.push(movie);
-        }
-      }
-    } catch (err) {
-      console.error(`error while finding ${title}`, err);
-    }
-  }
-  return results;
-}
-
-function makeMovieComponents(AI_recommend, usedMovies, navigation) {
-  for (let i = 0; i < AI_recommend.length; i++) {
-    const movie = AI_recommend[i];
-    const description = usedMovies[i].description;
-    movieComponents.push(
-      <TouchableOpacity
-        key={movie.id}
-        style={styles.showingMovie}
-        onPress={() => navigation.navigate("Detail", { id: movie.id })}
-      >
-        <View style={styles.topContainer}>
-          <Image
-            source={{
-              uri: `https://image.tmdb.org/t/p/w185${movie.poster_path}`,
-            }}
-            style={styles.poster}
-          />
-          <View style={styles.movieInfo}>
-            <Text style={styles.title}>{movie.title}</Text>
-            <Text style={styles.originalTitle}>{movie.original_title}</Text>
-            <Text style={styles.rating}>
-              {`★ ${movie.vote_average.toFixed(1)} `}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.AiInfo}>
-          <Text style={styles.aiInfoText}>
-            모바의 한줄평 :{"\n"} {description}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  }
-}
 
 const AIScreen = () => {
   const navigation = useNavigation();
@@ -85,16 +26,86 @@ const AIScreen = () => {
   const [AIanswer, setAIanswer] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [usedMovies, setUsedMovies] = useState([]);
+  const [AIrecommend, setAIrecommend] = useState([]);
+  const [movieComponents, setMovieComponents] = useState([]);
+
+  async function fetchMovieJsonList(titles) {
+    const results = [];
+    for (const movie of titles) {
+      const title = movie.title;
+      const year = movie.release_date;
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${title}&language=ko-KR&year=${year}`;
+      try {
+        const resp = await axios.get(url);
+        if (resp.data.results && resp.data.results.length > 0) {
+          if (resp.data.results[0].title === title) {
+            results.push(resp.data.results[0]);
+            setUsedMovies((prevMovies) => [...prevMovies, movie]);
+          }
+        }
+      } catch (err) {
+        console.error(`error while finding ${title}`, err);
+      }
+    }
+    setAIrecommend(results);
+    return results;
+  }
+
+  function makeMovieComponents() {
+    if (AIrecommend.length === 0) {
+      console.log("component에 추가할 게 없습니다");
+      return;
+    }
+    const components = [];
+    for (let i = 0; i < AIrecommend.length; i++) {
+      const movie = AIrecommend[i];
+      const description = usedMovies[i].description;
+      components.push(
+        <TouchableOpacity
+          key={movie.id}
+          style={styles.showingMovie}
+          onPress={() => navigation.navigate("Detail", { id: movie.id })}
+        >
+          <View style={styles.topContainer}>
+            <Image
+              source={{
+                uri: `https://image.tmdb.org/t/p/w185${movie.poster_path}`,
+              }}
+              style={styles.poster}
+            />
+            <View style={styles.movieInfo}>
+              <Text style={styles.title}>{movie.title}</Text>
+              <Text style={styles.originalTitle}>{movie.original_title}</Text>
+              <Text style={styles.rating}>
+                {`★ ${movie.vote_average.toFixed(1)} `}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.AiInfo}>
+            <Text style={styles.aiInfoText}>
+              모바의 한줄평 :{"\n"} {description}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    setMovieComponents(components);
+  }
+
   // post user prompt
   const handleUserPromptSubmit = async () => {
     setLoading(true);
-    usedMovies = [];
-    AI_recommend = [];
-    movieComponents = [];
+
+    setUsedMovies([]);
+    setAIrecommend([]);
+    setMovieComponents([]);
+
     if (userPrompt.trim() === "") {
       ToastAndroid.show("내용을 입력해주세요.", ToastAndroid.SHORT);
       return;
     }
+
     /** 프롬프트 백엔드에 보내는 코드 */
     try {
       const response = await fetch(`${BACKEND_URL}/ask`, {
@@ -104,9 +115,11 @@ const AIScreen = () => {
         },
         body: JSON.stringify({ question: userPrompt }),
       });
+
       if (!response.ok) {
         throw new Error(`서버 응답 오류: ${response.status}`);
       }
+
       console.log(`prompt: ${userPrompt}`);
       setUserPrompt("");
 
@@ -114,14 +127,17 @@ const AIScreen = () => {
       const resData = await response.json();
       console.log(resData);
       const data = resData.answer;
-      //const data = response.answer;
-      AI_recommend = await fetchMovieJsonList(data);
-      if (AI_recommend.length > 0) {
-        setAIanswer(AI_recommend[0]);
+
+      const fetchedMovies = await fetchMovieJsonList(data);
+      setAIrecommend(fetchedMovies);
+
+      if (AIrecommend.length > 0) {
+        setAIanswer(AIrecommend[0]);
       } else {
         setAIanswer("다시 한번만 물어바!");
       }
-      makeMovieComponents(AI_recommend, usedMovies, navigation);
+
+      // makeMovieComponents();
       setLoading(false);
     } catch (error) {
       console.error("질문 보내기를 실패하였습니다.", error.message);
@@ -130,8 +146,13 @@ const AIScreen = () => {
       setLoading(false);
       return null;
     }
-    /** 여기서 바로 추천작 id를 받아올 수 있으면 해당 id로 TMDB에서 포스터, 제목, 연도 등 정보 fetch */
   };
+
+  useEffect(() => {
+    if (AIrecommend.length > 0) {
+      makeMovieComponents(); // AIrecommend가 업데이트되면 이 함수 호출
+    }
+  }, [AIrecommend]);
 
   return (
     <KeyboardAvoidingView
@@ -161,9 +182,19 @@ const AIScreen = () => {
             />
           </View>
           {loading ? (
-            <Text style={styles.h1}>LOADING....</Text>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <LoadingAnimation
+                text="모바가 영화를 찾고 있어요"
+                style={styles.loading}
+              />
+            </View>
           ) : (
-            AIanswer !== "" && (
+            movieComponents.length !== 0 && (
               <View style={styles.container}>
                 <Text style={styles.h3}>모바픽 영화를 감상해보세요!</Text>
                 {movieComponents}
@@ -189,6 +220,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#141414",
+  },
+  loading: {
+    color: "#ddd",
+    fontSize: 18,
   },
   h1: {
     fontSize: 36,

@@ -11,7 +11,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { TMDB_API_KEY, BACKEND_URL } from "@env";
-import genresData from "../constants/genres.json"; // 경로는 프로젝트 구조에 따라 다름
+import genresData from "../constants/genres.json";
+import LoadingAnimation from "../components/LoadingAnimation";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
@@ -264,13 +265,20 @@ const PosterScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {surveyCompleted === null ? (
-        <Text>LOADING</Text>
+        <LoadingAnimation text="잠시만 기다려주세요" style={styles.loading} />
       ) : surveyCompleted ? (
         <View style={styles.container}>
           <View>
             <Text style={styles.recTitle}>좋아하실 만한 영화</Text>
             <View style={styles.posterContainer}>
-              {recommendedMovies.length !== 0 &&
+              {recommendedMovies.length === 0 ? (
+                <View>
+                  <LoadingAnimation
+                    text="잠시만 기다려주세요"
+                    style={styles.loading}
+                  />
+                </View>
+              ) : (
                 recommendedMovies.map((movie) => (
                   <View style={styles.movie} key={`1_${movie.id}`}>
                     <Image
@@ -281,13 +289,21 @@ const PosterScreen = () => {
                     />
                     <Text style={styles.movieTitle}>{movie.title}</Text>
                   </View>
-                ))}
+                ))
+              )}
             </View>
           </View>
           <View>
             <Text style={styles.recTitle}>도전해 볼 만한 영화</Text>
             <View style={styles.posterContainer}>
-              {howAboutMovies.length !== 0 &&
+              {howAboutMovies.length === 0 ? (
+                <View>
+                  <LoadingAnimation
+                    text="잠시만 기다려주세요"
+                    style={styles.loading}
+                  />
+                </View>
+              ) : (
                 howAboutMovies.slice(0, 6).map((movie) => (
                   <View style={styles.movie} key={`1_${movie.id}`}>
                     <Image
@@ -298,13 +314,21 @@ const PosterScreen = () => {
                     />
                     <Text style={styles.movieTitle}>{movie.title}</Text>
                   </View>
-                ))}
+                ))
+              )}
             </View>
           </View>
           <View>
             <Text style={styles.recTitle}>평점 높은 영화</Text>
             <View style={styles.posterContainer}>
-              {topRatedMovies.length !== 0 &&
+              {topRatedMovies.length === 0 ? (
+                <View>
+                  <LoadingAnimation
+                    text="잠시만 기다려주세요"
+                    style={styles.loading}
+                  />
+                </View>
+              ) : (
                 topRatedMovies.slice(0, 6).map((movie) => (
                   <TouchableOpacity
                     key={`3_${movie.id}`}
@@ -321,13 +345,21 @@ const PosterScreen = () => {
                     />
                     <Text style={styles.movieTitle}>{movie.title}</Text>
                   </TouchableOpacity>
-                ))}
+                ))
+              )}
             </View>
           </View>
           <View>
             <Text style={styles.recTitle}>리뷰 많은 영화</Text>
             <View style={styles.posterContainer}>
-              {topReviewedMovies.length !== 0 &&
+              {topReviewedMovies.length === 0 ? (
+                <View>
+                  <LoadingAnimation
+                    text="잠시만 기다려주세요"
+                    style={styles.loading}
+                  />
+                </View>
+              ) : (
                 topReviewedMovies.slice(0, 6).map((movie) => (
                   <TouchableOpacity
                     key={`4_${movie.id}`}
@@ -344,7 +376,8 @@ const PosterScreen = () => {
                     />
                     <Text style={styles.movieTitle}>{movie.title}</Text>
                   </TouchableOpacity>
-                ))}
+                ))
+              )}
             </View>
           </View>
           <Button
@@ -385,6 +418,10 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     borderRadius: 12,
     justifyContent: "center",
+  },
+  loading: {
+    color: "#ddd",
+    paddingLeft: 5,
   },
   posterContainer: {
     flexDirection: "row",

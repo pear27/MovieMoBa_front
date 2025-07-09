@@ -13,6 +13,7 @@ import {
   ToastAndroid,
 } from "react-native";
 import { TMDB_API_KEY, BACKEND_URL } from "@env";
+import LoadingAnimation from "../components/LoadingAnimation";
 
 const baseURL = "https://api.themoviedb.org/3/";
 const API_KEY = TMDB_API_KEY;
@@ -233,7 +234,17 @@ const DetailScreen = ({ route }) => {
               </View>
             ))
           ) : (
-            <Text>LOADING</Text>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <LoadingAnimation
+                text="리뷰 불러오는 중"
+                style={styles.loading}
+              />
+            </View>
           )}
         </View>
       </ScrollView>
@@ -252,6 +263,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#141414",
+  },
+  loading: {
+    color: "#ddd",
+    fontSize: 18,
   },
   backdrop: {
     width: "100%",
