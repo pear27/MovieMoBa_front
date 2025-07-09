@@ -44,7 +44,7 @@ const PosterScreen = () => {
 
   // 사용자가 선호한 영화의 Detail Fetching (영문 ver)
   // 결과값 likeMoviesDetails에 저장함
-  const getLikeMoviesDetail = async () => {
+  const getLikeMoviesDetail = async (likeMovies) => {
     try {
       const detailedMovies = [];
       const parsedMovies =
@@ -123,50 +123,43 @@ const PosterScreen = () => {
 
       const result = await response.json();
 
-      const genres_like = result.like;
-      const genres_soso = result.soso;
-
       const moviesWithGenres = [];
 
-      let like_id_list = [];
-      let soso_id_list = [];
+      // fetch한 genre들의 id를 배열에 저장
+      const getGenreIds = (result_like_or_soso) => {
+        return result_like_or_soso
+          .map((item) => genres.find((g) => g.name === item[0]))
+          .filter((g) => g) // null 제거
+          .map((g) => g.id);
+      };
 
-      for (const soso of genres_soso) {
-        for (const like of genres_like) {
-          let like_id, soso_id;
+      const like_id_list = getGenreIds(result.like);
+      const soso_id_list = getGenreIds(result.soso);
 
-          for (const genreJson of genres) {
-            if (genreJson.name === like[0]) {
-              like_id = genreJson.id;
-              like_id_list.push(like_id);
-            }
-            if (genreJson.name === soso[0]) {
-              soso_id = genreJson.id;
-              soso_id_list.push(soso_id);
-            }
-          }
-          if (like_id && soso_id) {
-            try {
-              const response = await fetch(
-                `${baseURL}discover/movie?api_key=${API_KEY}&with_genres=${like_id},${soso_id}&language=ko-KR&sort_by=popularity.desc`
-              );
-              const result = await response.json();
-              moviesWithGenres.push(result.results[0]);
-            } catch (error) {
-              console.error("장르 기반 fetching 실패: ", error);
-            }
-          } else {
-            console.warn(
-              "유효한 장르 ID가 없습니다. like_id:",
-              like_id,
-              "soso_id:",
-              soso_id
-            );
+      if (like_id_list.length === 2 && soso_id_list.length === 2) {
+        const genreCombos = [
+          [0, 0],
+          [0, 1],
+          [1, 0],
+          [1, 1],
+        ];
+
+        for (const [i, j] of genreCombos) {
+          const withGenres = `${like_id_list[i]},${soso_id_list[j]}`;
+          const withoutGenres = `${like_id_list[1 - i]},${soso_id_list[1 - j]}`;
+
+          const url = `${baseURL}discover/movie?api_key=${API_KEY}&with_genres=${withGenres}&without_genres=${withoutGenres}&language=ko-KR&sort_by=popularity.desc`;
+
+          try {
+            const response = await fetch(url);
+            const result = await response.json();
+            moviesWithGenres.push(result.results[0]);
+            // console.log(`🎬 조합 [${i},${j}] 결과:`, result.results[0]);
+          } catch (error) {
+            console.error(`❌ 조합 [${i},${j}] fetch 실패`, error);
           }
         }
-      }
 
-      if (like_id_list.length > 0 && soso_id_list.length > 0) {
         try {
           const response = await fetch(
             `${baseURL}discover/movie?api_key=${API_KEY}&with_genres=${soso_id_list[0]},${soso_id_list[1]}&without_genres=${like_id_list[0]},${like_id_list[1]}&language=ko-KR&sort_by=popularity.desc`
@@ -175,16 +168,14 @@ const PosterScreen = () => {
           moviesWithGenres.push(result.results[0]);
           moviesWithGenres.push(result.results[1]);
         } catch (error) {
-          console.error("장르 기반 fetching 실패: ", error);
+          console.error("❌ 조합 [soso[0], soso[1]] fetch 실패", error);
         }
       } else {
         console.warn(
-          "유효한 장르 ID가 없습니다. like_id:",
-          like_id_list[0],
-          like_id_list[1],
-          "soso_id:",
-          soso_id_list[0],
-          soso_id_list[1]
+          "장르 ID List가 유효하지 않습니다. like_id_list: ",
+          like_id_list,
+          "soso_id_list: ",
+          soso_id_list
         );
       }
 
@@ -248,9 +239,9 @@ const PosterScreen = () => {
         typeof value === "string" ? JSON.parse(value) : likeMovies;
 
       if (parsedMovies.length > 0) {
-        const detailed = await getLikeMoviesDetail();
+        const detailed = await getLikeMoviesDetail(likeMovies);
         await getRecommendedMovies(detailed);
-        getHowAboutMovies();
+        await getHowAboutMovies();
         fetchTopRatedMovies();
         fetchTopReviewedMovies();
       }
@@ -366,7 +357,7 @@ const PosterScreen = () => {
       ) : (
         <View style={styles.container}>
           <Text style={styles.h1}>내 영화 취향은 어떨까??</Text>
-          <Text style={styles.h6}>자신의 영화 MBTI를 분석해보세요!{'\n'}</Text>
+          <Text style={styles.h6}>자신의 영화 MBTI를 분석해보세요!{"\n"}</Text>
           <Button
             title="영화 취향 찾기"
             color="#e50914"
@@ -388,7 +379,7 @@ const styles = StyleSheet.create({
     minHeight: "100%",
   },
   container: {
-    flex:1,
+    flex: 1,
     backgroundColor: "#141414",
     paddingHorizontal: 4,
     paddingBottom: 32,
@@ -476,4 +467,3 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 });
-
