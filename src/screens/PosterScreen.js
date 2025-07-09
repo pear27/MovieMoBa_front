@@ -280,7 +280,13 @@ const PosterScreen = () => {
                 </View>
               ) : (
                 recommendedMovies.map((movie) => (
-                  <View style={styles.movie} key={`1_${movie.id}`}>
+                  <TouchableOpacity
+                    key={`1_${movie.id}`}
+                    style={styles.movie}
+                    onPress={() =>
+                      navigation.navigate("Detail", { id: movie.id })
+                    }
+                  >
                     <Image
                       source={{
                         uri: `https://image.tmdb.org/t/p/w342${movie.poster_path}`,
@@ -288,7 +294,7 @@ const PosterScreen = () => {
                       style={styles.poster}
                     />
                     <Text style={styles.movieTitle}>{movie.title}</Text>
-                  </View>
+                  </TouchableOpacity>
                 ))
               )}
             </View>
@@ -305,7 +311,13 @@ const PosterScreen = () => {
                 </View>
               ) : (
                 howAboutMovies.slice(0, 6).map((movie) => (
-                  <View style={styles.movie} key={`1_${movie.id}`}>
+                  <TouchableOpacity
+                    key={`2_${movie.id}`}
+                    style={styles.movie}
+                    onPress={() =>
+                      navigation.navigate("Detail", { id: movie.id })
+                    }
+                  >
                     <Image
                       source={{
                         uri: `https://image.tmdb.org/t/p/w342${movie.poster_path}`,
@@ -313,7 +325,7 @@ const PosterScreen = () => {
                       style={styles.poster}
                     />
                     <Text style={styles.movieTitle}>{movie.title}</Text>
-                  </View>
+                  </TouchableOpacity>
                 ))
               )}
             </View>
